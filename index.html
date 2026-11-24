@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MP3 Studio — Apple Music Edition</title>
+  <meta name="description" content="MP3 Studio: Professional audio editor with trim, EQ, mixer, recorder, downloader and more — Apple Music aesthetic." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/apple-glass.css" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     ANDROID DEVICE FRAME WRAPPER
+══════════════════════════════════════════ -->
+<div class="device-wrapper">
+  <div class="device-frame" id="deviceFrame">
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span class="status-time" id="statusTime">9:41</span>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1" opacity="0.4"/><rect x="4" y="2" width="3" height="10" rx="1" opacity="0.6"/><rect x="8" y="0" width="3" height="12" rx="1" opacity="0.8"/><rect x="12" y="0" width="3" height="12" rx="1"/></svg>
+        <svg width="16" height="12" viewBox="0 0 24 24" fill="white"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.56 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="white" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="white"/><path d="M23 4.5v3c.828-.552 1.328-1.5 1.328-1.5S23.828 5.052 23 4.5z" fill="white" opacity="0.4"/></svg>
+      </div>
+    </div>
+
+    <!-- App Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="app-logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </div>
+        <div class="header-text">
+          <span class="app-name">MP3 Studio</span>
+          <span class="app-screen-label" id="screenLabel">Editor</span>
+        </div>
+      </div>
+      <button class="header-action" onclick="togglePlayerBar()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+      </button>
+    </header>
+
+    <!-- Mini Player Bar -->
+    <div class="mini-player" id="miniPlayer" style="display:none;">
+      <div class="mini-player-art">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      </div>
+      <div class="mini-player-info">
+        <span id="miniTitle">No track loaded</span>
+        <span id="miniArtist">—</span>
+      </div>
+      <div class="mini-player-controls">
+        <button onclick="togglePlayback()" id="miniPlayBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+        </button>
+        <button onclick="stopPlayback()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Screen Content Area -->
+    <main class="screen-content" id="screenContent">
+
+      <!-- ══ EDITOR SCREEN ══ -->
+      <div class="screen active" id="screen-editor">
+        <div class="screen-scroll">
+          <div class="section-header">
+            <h1 class="section-title">Audio Editor</h1>
+            <p class="section-subtitle" id="editorSubtitle">No track loaded</p>
+          </div>
+
+          <!-- Upload Card -->
+          <div class="glass-card upload-card" id="uploadCard">
+            <div class="upload-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            </div>
+            <p class="upload-hint">Load an audio file to start editing</p>
+            <label class="pill-btn primary" for="audioFileInput">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              Browse Files
+            </label>
+            <input type="file" id="audioFileInput" accept="audio/*" style="display:none;" onchange="loadAudioFile(this)" />
+          </div>
+
+          <!-- Waveform Card -->
+          <div class="glass-card waveform-card">
+            <!-- Track info -->
+            <div class="track-info-row" id="trackInfoRow" style="display:none;">
+              <div class="track-art">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              </div>
+              <div class="track-meta">
+                <span class="track-name" id="trackName">Track Name</span>
+                <span class="track-duration" id="trackDuration">0:00</span>
+              </div>
+              <button class="play-btn" id="playBtn" onclick="togglePlayback()">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" id="playIcon"><polygon points="5,3 19,12 5,21"/></svg>
+              </button>
+            </div>
+
+            <!-- Canvas Waveform -->
+            <canvas id="waveformCanvas" width="600" height="120" class="waveform-canvas"></canvas>
+
+            <!-- Trim times -->
+            <div class="trim-times">
+              <span id="trimStart" class="trim-label">0:00.00</span>
+              <div class="trim-center-label">Trim Range</div>
+              <span id="trimEnd" class="trim-label">0:00.00</span>
+            </div>
+
+            <button class="pill-btn primary full-width" onclick="applyTrim()">✂️ Apply Trim</button>
+          </div>
+
+          <!-- Tool Tabs -->
+          <div class="segmented-control" id="toolTabs">
+            <button class="seg-btn active" onclick="selectTool(0, this)">Trim</button>
+            <button class="seg-btn" onclick="selectTool(1, this)">Speed</button>
+            <button class="seg-btn" onclick="selectTool(2, this)">Pitch</button>
+            <button class="seg-btn" onclick="selectTool(3, this)">Vol</button>
+            <button class="seg-btn" onclick="selectTool(4, this)">Fade</button>
+            <button class="seg-btn" onclick="selectTool(5, this)">Denoise</button>
+          </div>
+
+          <!-- Tool Cards -->
+          <div class="tool-cards">
+            <div class="tool-card glass-card active" id="tool-0">
+              <h3 class="tool-title">✂️ Trim & Cut</h3>
+              <p class="tool-desc">Drag the waveform handles to select your trim range. Press "Apply Trim" to cut the audio.</p>
+            </div>
+            <div class="tool-card glass-card" id="tool-1">
+              <h3 class="tool-title">⚡ Speed Control</h3>
+              <div class="slider-row">
+                <label>Speed: <span id="speedVal" class="accent-label">1.00x</span></label>
+                <input type="range" class="apple-range" id="speedSlider" min="25" max="300" value="100" oninput="updateSpeed(this.value)" />
+              </div>
+              <div class="preset-row">
+                <button class="preset-chip" onclick="setSpeed(50)">0.5x</button>
+                <button class="preset-chip" onclick="setSpeed(75)">0.75x</button>
+                <button class="preset-chip active" onclick="setSpeed(100)">1x</button>
+                <button class="preset-chip" onclick="setSpeed(125)">1.25x</button>
+                <button class="preset-chip" onclick="setSpeed(150)">1.5x</button>
+                <button class="preset-chip" onclick="setSpeed(200)">2x</button>
+              </div>
+            </div>
+            <div class="tool-card glass-card" id="tool-2">
+              <h3 class="tool-title">🎵 Pitch Shift</h3>
+              <div class="pitch-display"><span id="pitchVal">0</span> <small>semitones</small></div>
+              <input type="range" class="apple-range purple" id="pitchSlider" min="-12" max="12" value="0" step="1" oninput="updatePitch(this.value)" />
+              <div class="range-labels"><span>-12</span><span>0</span><span>+12</span></div>
+            </div>
+            <div class="tool-card glass-card" id="tool-3">
+              <h3 class="tool-title">🔊 Volume & Gain Boost</h3>
+              <div class="big-value blue" id="volDisplay">100%</div>
+              <div class="slider-row">
+                <label>Volume (up to 300%): <span id="volVal" class="accent-label blue">100%</span></label>
+                <input type="range" class="apple-range blue" id="volSlider" min="0" max="300" value="100" oninput="updateVolume(this.value)" />
+              </div>
+            </div>
+            <div class="tool-card glass-card" id="tool-4">
+              <h3 class="tool-title">📈 Fade In / Fade Out</h3>
+              <div class="slider-row">
+                <label>Fade In: <span id="fadeInVal" class="accent-label green">1s</span></label>
+                <input type="range" class="apple-range green" id="fadeInSlider" min="100" max="10000" value="1000" step="100" oninput="updateFadeIn(this.value)" />
+              </div>
+              <div class="slider-row" style="margin-top:12px;">
+                <label>Fade Out: <span id="fadeOutVal" class="accent-label orange">1s</span></label>
+                <input type="range" class="apple-range orange" id="fadeOutSlider" min="100" max="10000" value="1000" step="100" oninput="updateFadeOut(this.value)" />
+              </div>
+              <div class="btn-row" style="margin-top:16px;">
+                <button class="pill-btn secondary" onclick="applyFade('in')">Apply Fade In</button>
+                <button class="pill-btn primary" onclick="applyFade('out')">Apply Fade Out</button>
+              </div>
+            </div>
+            <div class="tool-card glass-card" id="tool-5">
+              <h3 class="tool-title">🧹 Denoise & Silence Removal</h3>
+              <p class="tool-desc">Apply noise gate and high-pass filter to remove background hiss, room noise, and mic static.</p>
+              <div class="btn-col" style="margin-top:16px;">
+                <button class="pill-btn primary full-width" onclick="applyDenoise()">Apply Denoise</button>
+                <button class="pill-btn secondary full-width" style="margin-top:10px;" onclick="removeSilence()">Remove Silence</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="btn-row">
+            <label class="pill-btn secondary flex-1" for="audioFileInput2">
+              📂 Load New
+              <input type="file" id="audioFileInput2" accept="audio/*" style="display:none;" onchange="loadAudioFile(this)" />
+            </label>
+            <button class="pill-btn primary flex-1" onclick="exportTrack()">⬇ Export</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ MIXER SCREEN ══ -->
+      <div class="screen" id="screen-mixer">
+        <div class="screen-scroll">
+          <div class="section-header">
+            <h1 class="section-title">Multi-Track Mixer</h1>
+            <p class="section-subtitle" id="mixerSubtitle">0 tracks loaded</p>
+          </div>
+          <div class="glass-card">
+            <div class="row-between">
+              <div>
+                <div class="card-title">Mix Studio</div>
+                <div class="card-sub">Layer multiple tracks together</div>
+              </div>
+              <button class="icon-btn red" onclick="addMixerTrack()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+            </div>
+          </div>
+          <div id="mixerTracks" style="margin-top:12px;display:flex;flex-direction:column;gap:10px;"></div>
+          <div id="mixerEmpty" class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            <p>Tap + to add your first track</p>
+          </div>
+          <button class="pill-btn primary full-width" style="margin-top:16px;" onclick="mixDown()">🔀 Mix Down to Single Track</button>
+        </div>
+      </div>
+
+      <!-- ══ RECORDER SCREEN ══ -->
+      <div class="screen" id="screen-recorder">
+        <div class="screen-scroll centered">
+          <div class="section-header">
+            <h1 class="section-title">Recorder & Dub</h1>
+            <p class="section-subtitle">Studio quality microphone recording</p>
+          </div>
+          <div class="glass-card">
+            <div class="row-between">
+              <div>
+                <div class="card-title" id="recModeTitle">Record Mode</div>
+                <div class="card-sub" id="recModeDesc">Standalone audio recording</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="dubModeToggle" onchange="toggleDubMode(this)" />
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+          </div>
+          <div class="glass-card" style="margin-top:12px;">
+            <div class="card-sub">Live Input Level</div>
+            <canvas id="vuMeter" width="600" height="80" class="vu-canvas"></canvas>
+            <div class="slider-row" style="margin-top:12px;">
+              <label>Input Gain: <span id="gainVal" class="accent-label orange">80%</span></label>
+              <input type="range" class="apple-range orange" id="gainSlider" min="0" max="200" value="80" oninput="updateGain(this.value)" />
+            </div>
+            <div class="row-between" style="margin-top:12px;">
+              <label class="toggle-row">
+                <span class="card-sub">Monitor / Echo</span>
+                <label class="toggle-switch small">
+                  <input type="checkbox" id="echoToggle" />
+                  <span class="toggle-track"></span>
+                </label>
+              </label>
+            </div>
+          </div>
+
+          <div class="rec-timer" id="recTimer" style="display:none;">
+            <div class="timer-display" id="timerDisplay">00:00</div>
+            <div class="rec-indicator"><div class="rec-dot"></div><span>Recording...</span></div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;align-items:center;margin:24px 0;">
+            <button class="record-btn" id="recordBtn" onclick="toggleRecording()">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="white" id="recIcon"><circle cx="12" cy="12" r="8"/></svg>
+            </button>
+            <p class="card-sub" style="margin-top:10px;" id="recHint">Tap to start recording</p>
+          </div>
+
+          <div class="glass-card dub-panel" id="dubPanel" style="display:none;">
+            <div class="card-title">Background Track</div>
+            <div class="card-sub">Load a track to record your voice over</div>
+            <button class="pill-btn secondary full-width" style="margin-top:12px;">📂 Browse Background Track</button>
+          </div>
+
+          <div id="savedRecordings" style="margin-top:12px;display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </div>
+
+      <!-- ══ EQ SCREEN ══ -->
+      <div class="screen" id="screen-eq">
+        <div class="screen-scroll">
+          <div class="section-header">
+            <h1 class="section-title">Equalizer</h1>
+            <p class="section-subtitle">5-Band Graphic EQ + Volume Boost</p>
+          </div>
+          <!-- EQ Faders -->
+          <div class="glass-card">
+            <div class="eq-faders-row">
+              <div class="eq-fader-col">
+                <span class="eq-db" id="eq0db">+0dB</span>
+                <input type="range" class="eq-fader" id="eq0" min="-12" max="12" value="0" step="1" oninput="updateEQBand(0, this.value)" style="--eq-color:#FA243C"/>
+                <span class="eq-freq">60Hz</span>
+              </div>
+              <div class="eq-fader-col">
+                <span class="eq-db" id="eq1db">+0dB</span>
+                <input type="range" class="eq-fader" id="eq1" min="-12" max="12" value="0" step="1" oninput="updateEQBand(1, this.value)" style="--eq-color:#FF9F0A"/>
+                <span class="eq-freq">230Hz</span>
+              </div>
+              <div class="eq-fader-col">
+                <span class="eq-db" id="eq2db">+0dB</span>
+                <input type="range" class="eq-fader" id="eq2" min="-12" max="12" value="0" step="1" oninput="updateEQBand(2, this.value)" style="--eq-color:#30D158"/>
+                <span class="eq-freq">910Hz</span>
+              </div>
+              <div class="eq-fader-col">
+                <span class="eq-db" id="eq3db">+0dB</span>
+                <input type="range" class="eq-fader" id="eq3" min="-12" max="12" value="0" step="1" oninput="updateEQBand(3, this.value)" style="--eq-color:#0A84FF"/>
+                <span class="eq-freq">3.6kHz</span>
+              </div>
+              <div class="eq-fader-col">
+                <span class="eq-db" id="eq4db">+0dB</span>
+                <input type="range" class="eq-fader" id="eq4" min="-12" max="12" value="0" step="1" oninput="updateEQBand(4, this.value)" style="--eq-color:#BF5AF2"/>
+                <span class="eq-freq">14kHz</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Volume Boost -->
+          <div class="glass-card" style="margin-top:12px;">
+            <div class="card-title">Volume Booster</div>
+            <div class="slider-row" style="margin-top:12px;">
+              <label>Master Gain (up to 300%): <span id="masterVolVal" class="accent-label blue">100%</span></label>
+              <input type="range" class="apple-range blue" id="masterVolSlider" min="0" max="300" value="100" oninput="updateMasterVol(this.value)" />
+            </div>
+          </div>
+
+          <!-- Presets -->
+          <div class="glass-card" style="margin-top:12px;">
+            <div class="card-title">EQ Presets</div>
+            <div class="preset-wrap" style="margin-top:12px;">
+              <button class="preset-chip" onclick="applyEQPreset('flat')">Flat</button>
+              <button class="preset-chip" onclick="applyEQPreset('bass')">Bass Boost</button>
+              <button class="preset-chip" onclick="applyEQPreset('treble')">Treble</button>
+              <button class="preset-chip" onclick="applyEQPreset('rock')">Rock</button>
+              <button class="preset-chip" onclick="applyEQPreset('pop')">Pop</button>
+              <button class="preset-chip" onclick="applyEQPreset('jazz')">Jazz</button>
+              <button class="preset-chip" onclick="applyEQPreset('vocal')">Vocal</button>
+              <button class="preset-chip" onclick="applyEQPreset('electronic')">Electronic</button>
+              <button class="preset-chip" onclick="applyEQPreset('classical')">Classical</button>
+            </div>
+          </div>
+
+          <!-- Format Converter -->
+          <div class="glass-card" style="margin-top:12px;">
+            <div class="card-title">🔄 Format Converter</div>
+            <div class="card-sub">Select output format and export</div>
+            <div class="segmented-control" style="margin-top:14px;" id="formatTabs">
+              <button class="seg-btn active" onclick="selectFormat(0,this)">MP3</button>
+              <button class="seg-btn" onclick="selectFormat(1,this)">WAV</button>
+              <button class="seg-btn" onclick="selectFormat(2,this)">AAC</button>
+              <button class="seg-btn" onclick="selectFormat(3,this)">OGG</button>
+              <button class="seg-btn" onclick="selectFormat(4,this)">FLAC</button>
+            </div>
+            <button class="pill-btn primary full-width" style="margin-top:14px;" onclick="exportTrack()">⬇ Export as <span id="exportFormatLabel">MP3</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ METADATA SCREEN ══ -->
+      <div class="screen" id="screen-metadata">
+        <div class="screen-scroll">
+          <div class="section-header">
+            <h1 class="section-title">Metadata & Tags</h1>
+            <p class="section-subtitle">Edit ID3v2.3 song information</p>
+          </div>
+          <!-- Cover art -->
+          <div class="glass-card">
+            <div class="cover-art-row">
+              <label class="cover-art-box" for="coverInput">
+                <div class="cover-art-inner" id="coverPreview">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  <span>Add Cover</span>
+                </div>
+                <input type="file" id="coverInput" accept="image/*" style="display:none;" onchange="loadCoverArt(this)" />
+              </label>
+              <div class="cover-art-info">
+                <div class="card-title">Album Cover Art</div>
+                <div class="card-sub">JPG / PNG up to 3000×3000px</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Metadata fields -->
+          <div class="glass-card" style="margin-top:12px;">
+            <div class="card-title">Track Information</div>
+            <div class="meta-fields">
+              <div class="meta-field">
+                <span class="field-icon">🎵</span>
+                <input class="meta-input" type="text" id="metaTitle" placeholder="Title" />
+              </div>
+              <div class="meta-field">
+                <span class="field-icon">👤</span>
+                <input class="meta-input" type="text" id="metaArtist" placeholder="Artist" />
+              </div>
+              <div class="meta-field">
+                <span class="field-icon">💿</span>
+                <input class="meta-input" type="text" id="metaAlbum" placeholder="Album" />
+              </div>
+              <div class="meta-row">
+                <div class="meta-field half">
+                  <span class="field-icon">📅</span>
+                  <input class="meta-input" type="text" id="metaYear" placeholder="Year" />
+                </div>
+                <div class="meta-field half">
+                  <span class="field-icon">#️⃣</span>
+                  <input class="meta-input" type="text" id="metaTrack" placeholder="Track #" />
+                </div>
+              </div>
+              <div class="meta-field">
+                <span class="field-icon">🎸</span>
+                <input class="meta-input" type="text" id="metaGenre" placeholder="Genre" />
+              </div>
+              <div class="meta-field">
+                <span class="field-icon">📝</span>
+                <textarea class="meta-input meta-textarea" id="metaLyrics" placeholder="Paste lyrics here..."></textarea>
+              </div>
+            </div>
+            <button class="pill-btn primary full-width" style="margin-top:16px;" onclick="saveMetadata()">💾 Save Metadata & Export</button>
+          </div>
+
+          <!-- Ringtone -->
+          <div class="glass-card" style="margin-top:12px;">
+            <div class="card-title">🔔 System Integration</div>
+            <div class="card-sub">Set as your device ringtone, alarm, or notification.</div>
+            <div class="ringtone-btns" style="margin-top:14px;">
+              <button class="ringtone-btn" style="--ring-color:#FA243C;" onclick="setRingtone('ringtone')">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 10.5 19.36 19.36 0 0 1 2.56 2a2 2 0 0 1 1.88-2.14h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <span>Ringtone</span>
+              </button>
+              <button class="ringtone-btn" style="--ring-color:#FF9F0A;" onclick="setRingtone('alarm')">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6"/><path d="M22 6l-3-3"/></svg>
+                <span>Alarm</span>
+              </button>
+              <button class="ringtone-btn" style="--ring-color:#0A84FF;" onclick="setRingtone('notification')">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <span>Notif.</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ DOWNLOADER SCREEN (MEDIAVAULT INTEGRATION) ══ -->
+      <div class="screen" id="screen-downloader">
+        <div class="screen-scroll">
+          <div class="section-header">
+            <h1 class="section-title">Media Downloader</h1>
+            <p class="section-subtitle">Download & import videos and audio</p>
+          </div>
+
+          <!-- Server connection status badge -->
+          <div class="server-status-badge" id="serverStatusBadge">
+            <span class="status-dot-pulse offline" id="serverStatusDot"></span>
+            <span id="serverStatusText">Connecting backend...</span>
+          </div>
+
+          <!-- Supported Platforms Chips Row -->
+          <div class="platform-chips-row" id="platformChipsRow">
+            <span class="platform-chip" id="chip-youtube" style="--chip-color:#FF0000;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.6 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.5 15.6V8.4L16 12l-6.5 3.6z"/></svg>
+              YouTube
+            </span>
+            <span class="platform-chip" id="chip-instagram" style="--chip-color:#E1306C;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8 0 3.2 0 3.6-.1 4.8-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.9.1-3.2 0-3.6 0-4.8-.1-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12c0-3.2 0-3.6.1-4.8C2.4 3.9 4 2.3 7.2 2.3c1.2-.1 1.6-.1 4.8-.1zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1.0 8.3 0 8.7 0 12c0 3.3 0 3.7.1 4.9.2 4.4 2.6 6.8 7 7C8.3 24 8.7 24 12 24c3.3 0 3.7 0 4.9-.1 4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9 0-3.3 0-3.7-.1-4.9C23.7 2.7 21.3.3 16.9.1 15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4A6.2 6.2 0 0 0 12 5.8zm0 10.2a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-11.8a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8z"/></svg>
+              Instagram
+            </span>
+            <span class="platform-chip" id="chip-tiktok" style="--chip-color:#25F4EE;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/></svg>
+              TikTok
+            </span>
+            <span class="platform-chip" id="chip-facebook" style="--chip-color:#1877F2;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              Facebook
+            </span>
+            <span class="platform-chip" id="chip-twitter" style="--chip-color:#1DA1F2;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              Twitter/X
+            </span>
+          </div>
+
+          <!-- URL / Search Tabs -->
+          <div class="segmented-control" style="margin-top:4px;" id="dlTabs">
+            <button class="seg-btn active" onclick="selectDLTab(0,this)">Media Link</button>
+            <button class="seg-btn" onclick="selectDLTab(1,this)">Search Catalog</button>
+          </div>
+
+          <!-- URL Input Card -->
+          <div class="glass-card" style="margin-top:12px;" id="dlUrlPanel">
+            <div class="card-title">Paste Video or Audio URL</div>
+            <div class="url-input-container" style="margin-top:10px;">
+              <span id="urlPlatformIcon" style="display:flex;align-items:center;color:var(--t2);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              </span>
+              <input type="url" id="dlUrl" placeholder="Paste YouTube, Reels, TikTok, or X link..." oninput="onMediaUrlChange(this.value)" />
+              <button class="paste-action-btn" type="button" onclick="pasteMediaUrl()">
+                📋 Paste
+              </button>
+            </div>
+            <button class="pill-btn primary full-width" style="margin-top:12px;" id="analyzeBtn" onclick="analyzeMediaUrl()">
+              ⚡ Analyze Link
+            </button>
+          </div>
+
+          <!-- Media Analysis Card (Rendered dynamically) -->
+          <div id="mediaAnalysisCard" class="media-analysis-card" style="display:none;">
+            <div class="media-card-top">
+              <div class="media-thumbnail-box">
+                <img id="mediaThumb" class="media-thumbnail-img" src="" alt="Thumbnail" />
+                <span id="mediaDuration" class="media-duration-tag">0:00</span>
+              </div>
+              <div class="media-info-col">
+                <div id="mediaTitle" class="media-card-title">Media Title</div>
+                <div class="media-card-meta">
+                  <span id="mediaPlatformBadge" class="media-platform-badge" style="background:rgba(255,0,0,0.2);color:#FF0000;">YouTube</span>
+                  <span id="mediaUploader">Uploader</span>
+                  <span id="mediaViews">· 0 views</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Format & Quality Grid -->
+            <div style="margin-top:14px;">
+              <div class="card-sub" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--t2);">Choose Format & Quality</div>
+              <div class="format-grid" id="formatGrid">
+                <!-- Video Formats -->
+                <div class="format-card-pill" onclick="selectMediaFormat('mp4_1080p', '1080p', this)">
+                  <div class="format-card-info">
+                    <span class="format-main-label">MP4 Video</span>
+                    <span class="format-sub-label">1080p Full HD</span>
+                  </div>
+                  <span class="format-badge-pill">1080p</span>
+                </div>
+                <div class="format-card-pill" onclick="selectMediaFormat('mp4_720p', '720p', this)">
+                  <div class="format-card-info">
+                    <span class="format-main-label">MP4 Video</span>
+                    <span class="format-sub-label">720p HD</span>
+                  </div>
+                  <span class="format-badge-pill">720p</span>
+                </div>
+                <div class="format-card-pill" onclick="selectMediaFormat('mp4_480p', '480p', this)">
+                  <div class="format-card-info">
+                    <span class="format-main-label">MP4 Video</span>
+                    <span class="format-sub-label">480p SD</span>
+                  </div>
+                  <span class="format-badge-pill">480p</span>
+                </div>
+                <!-- Audio Extraction -->
+                <div class="format-card-pill selected" onclick="selectMediaFormat('mp3_audio', 'mp3', this)">
+                  <div class="format-card-info">
+                    <span class="format-main-label">MP3 Audio</span>
+                    <span class="format-sub-label">192 kbps High</span>
+                  </div>
+                  <span class="format-badge-pill">Audio</span>
+                </div>
+              </div>
+
+              <!-- Start Download button -->
+              <button class="pill-btn primary full-width" style="margin-top:14px;" id="startDownloadBtn" onclick="startMediaDownload()">
+                ⬇ Download Now
+              </button>
+            </div>
+          </div>
+
+          <!-- Download Progress Card -->
+          <div id="downloadProgressCard" class="download-progress-card" style="display:none;">
+            <div class="progress-header-row">
+              <span class="progress-status-text" id="progressStatusText">
+                <span class="spinner" style="width:12px;height:12px;border-width:2px;"></span>
+                Downloading...
+              </span>
+              <span class="progress-percent-text" id="progressPercentText">0%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="progressFill" style="width:0%;"></div>
+            </div>
+            <div class="progress-metrics-row">
+              <span id="progressSpeedText">Speed: --</span>
+              <span id="progressEtaText">ETA: --</span>
+            </div>
+          </div>
+
+          <!-- Download Complete & Studio Handoff Card -->
+          <div id="downloadReadyCard" class="glass-card" style="margin-top:14px;display:none;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:rgba(48,209,88,0.2);display:flex;align-items:center;justify-content:center;color:#30D158;">
+                ✓
+              </div>
+              <div>
+                <div class="card-title" style="color:#30D158;">File Ready!</div>
+                <div class="card-sub" id="readyFilename">track.mp3</div>
+              </div>
+            </div>
+            <div class="ready-action-buttons">
+              <button class="pill-btn primary full-width" onclick="openDownloadedInEditor()">
+                ✂️ Open in Audio Editor
+              </button>
+              <button class="pill-btn secondary full-width" onclick="addDownloadedToMixer()">
+                🎛️ Add to Multi-Track Mixer
+              </button>
+              <button class="pill-btn secondary full-width" onclick="saveDownloadedFile()">
+                💾 Save File to Device
+              </button>
+            </div>
+          </div>
+
+          <!-- Search Panel -->
+          <div class="glass-card" style="margin-top:12px;display:none;" id="dlSearchPanel">
+            <div class="card-title">Search Music Catalog</div>
+            <div class="search-input-row" style="margin-top:12px;">
+              <input type="text" class="meta-input" id="dlQuery" placeholder="Search songs, artists, tracks..." />
+            </div>
+            <button class="pill-btn primary full-width" style="margin-top:12px;" onclick="searchMusic()">🔍 Search</button>
+          </div>
+
+          <!-- Loading state -->
+          <div id="dlLoading" style="display:none;" class="loading-state">
+            <div class="spinner"></div>
+            <p id="dlLoadingText">Analyzing media link...</p>
+          </div>
+
+          <!-- Search Results -->
+          <div id="dlResults" style="margin-top:12px;display:flex;flex-direction:column;gap:10px;"></div>
+
+          <!-- Empty State -->
+          <div id="dlEmpty" class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
+            <p>Paste a link from YouTube, Instagram, TikTok, Facebook, or X to begin</p>
+          </div>
+        </div>
+      </div>
+
+    </main><!-- /.screen-content -->
+
+    <!-- ══ BOTTOM NAVIGATION ══ -->
+    <nav class="bottom-nav" id="bottomNav">
+      <button class="nav-item active" id="nav-editor" onclick="navigateTo('editor', this)">
+        <div class="nav-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <span class="nav-label">Editor</span>
+        <div class="nav-dot"></div>
+      </button>
+      <button class="nav-item" id="nav-mixer" onclick="navigateTo('mixer', this)">
+        <div class="nav-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <span class="nav-label">Mixer</span>
+        <div class="nav-dot"></div>
+      </button>
+      <button class="nav-item" id="nav-recorder" onclick="navigateTo('recorder', this)">
+        <div class="nav-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </div>
+        <span class="nav-label">Record</span>
+        <div class="nav-dot"></div>
+      </button>
+      <button class="nav-item" id="nav-eq" onclick="navigateTo('eq', this)">
+        <div class="nav-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+        </div>
+        <span class="nav-label">EQ</span>
+        <div class="nav-dot"></div>
+      </button>
+      <button class="nav-item" id="nav-metadata" onclick="navigateTo('metadata', this)">
+        <div class="nav-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        </div>
+        <span class="nav-label">Tags</span>
+        <div class="nav-dot"></div>
+      </button>
+      <button class="nav-item" id="nav-downloader" onclick="navigateTo('downloader', this)">
+        <div class="nav-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
+        </div>
+        <span class="nav-label">Download</span>
+        <div class="nav-dot"></div>
+      </button>
+    </nav>
+
+    <!-- Processing Toast -->
+    <div class="toast" id="toast"></div>
+
+  </div><!-- /.device-frame -->
+</div><!-- /.device-wrapper -->
+
+<script src="js/audio-engine.js"></script>
+<script src="js/waveform.js"></script>
+<script src="js/encoder.js"></script>
+<script src="js/downloader.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
